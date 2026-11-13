@@ -1,0 +1,755 @@
+\documentclass{article}
+
+\usepackage[preprint]{neurips_2026}
+\setcitestyle{numbers,square}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\graphicspath{{figures/}{report/figures/}{images/}{report/images/}{../main/figures/}{../main/images/}}
+
+\newcommand{\safeincludegraphics}[2][]{%
+  \IfFileExists{#2}{\includegraphics[#1]{#2}}{\IfFileExists{../#2}{\includegraphics[#1]{../#2}}{\fbox{\parbox[c][3.2cm][c]{\linewidth}{\centering \small \texttt{\detokenize{#2}}}}}}%
+}
+
+% Helper macro for your writing cues (remove or replace with your text before submission)
+\newcommand{\writetodo}[1]{\noindent\textcolor{blue}{\textbf{[TODO -- WRITE HERE]:} #1}\par\medskip}
+
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=*}
+
+% Tight typographic spacing for strict 8-page budget
+\setlength{\tabcolsep}{3.0pt}
+\renewcommand{\arraystretch}{0.94}
+\setlength{\textfloatsep}{5pt plus 1.0pt minus 1.0pt}
+\setlength{\floatsep}{4pt plus 1.0pt minus 1.0pt}
+\setlength{\intextsep}{4pt plus 1.0pt minus 1.0pt}
+\setlength{\abovecaptionskip}{2pt plus 1pt minus 1pt}
+\setlength{\belowcaptionskip}{0pt}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.85}
+
+\title{EE-5102 / CS-6304: Advanced Topics in Machine Learning\\Programming Assignment 3: Fine-Tuning, Vision-Language Grounding, and Test-Time Compute}
+
+\author{%
+  Abdullah Fayyaz \\
+  Department of Computer Science / Electrical Engineering \\
+  Lahore University of Management Sciences \\
+  \texttt{28100069@lums.edu.pk} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\writetodo{Write a 150--200 word summary in your own words:
+(1) State the goal of the report across the 3 tasks.
+(2) Task 1: Mention fine-tuning Qwen3-0.6B on MetaMathQA across Full FT, L2-SP, LoRA (r=4, 16), and OPLoRA (r=16, k=128), and state your main finding on GSM8K adaptation (+17.2 to +21.5 pp) vs.\ BoolQ/HellaSwag/ARC-Easy retention.
+(3) Task 2: Mention connecting frozen SigLIP to Qwen3-0.6B via a 2-layer MLP across the 3-stage curriculum, and state your main finding on complementary pair swaps ($\Delta\text{Acc} = +39.8$ pp on Grounding, $+26.1$ pp on Natural VQA) and 196 vs.\ 49 token compression.
+(4) Task 3: Mention evaluating Qwen2.5-3B on MATH and Qwen2.5-VL-3B on MathVista ($N \in \{1,\dots,32\}$), comparing RWC, VisConf, live refinement vs.\ parallel sampling, and adaptive stopping (54.5\%--64.5\% token savings).}
+Code and configuration files to reproduce all experiments are available at: \url{https://github.com/FayyazAbdullah2005/PA3-ATML}.
+\end{abstract}
+
+% =========================================================================
+% SECTION 1: TASK 1 - LARGE LANGUAGE MODEL FINE-TUNING
+% =========================================================================
+\section{Task 1: Large Language Model Fine-Tuning}
+\label{sec:task1}
+
+\subsection{Methodology}
+\label{sec:task1_methodology}
+For our fine-tuning experiments, we used a post-trained \texttt{Qwen/Qwen3-0.6B} with thinking disabled during training and generation. 40,000 examples from MetaMathQA were chosen as training data. The model was fine-tuned for 1 epoch (1,250 updates). We used \texttt{lm-evaluation-harness} with fixed task definitions and complete splits as our evaluation dataset. All models were evaluated in FP16 with dropout disabled. The training objective was to minimize next-token cross-entropy over assistant response and end-of-turn tokens without old-task replay (full equations in Appendix~\ref{sec:app_setups}).  We inspect down\_proj across layers 0,13,27  to measure subspace interference ($\rho_k$), relative update size ($\eta$), and local activation shifts ($R(z)$) on  the probe prompts and also evaluate greedy generations on unrelated prompts .
+
+Starting independently from the pretrained checkpoint $\theta_0$, we compare five variants: unconstrained \textbf{Full FT} ($\lambda=0$, peak LR $2\times 10^{-5}$), \textbf{Full FT + L2-SP} ($\lambda=10^{-3}$, penalizing distance from $\theta_0$), \textbf{LoRA} at ranks $r \in \{4, 16\}$ ($\alpha=2r$, peak LR $2\times 10^{-4}$) across all seven linear projections (\texttt{q, k, v, o, gate, up, down\_proj}), and \textbf{OPLoRA} ($r=16, k=128$), which projects adapter updates orthogonal to the top-$k$ singular subspaces of $W_0$ (see Appendix~\ref{sec:app_setups}).
+
+\subsection{Results and Analysis}
+\label{sec:task1_results}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 1 Benchmark Results across Seven Evaluation Conditions. GSM8K reports flexible-extraction exact match; HellaSwag and ARC-Easy report normalized accuracy (and raw accuracy); BoolQ reports raw accuracy. Changes from baseline are in percentage points ($\Delta$ pp).}
+    \label{tab:t1_benchmarks}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{lcccccccccccc}
+        \toprule
+        & \multicolumn{2}{c}{GSM8K (CoT)} & \multicolumn{2}{c}{HellaSwag (Norm / Raw)} & \multicolumn{2}{c}{BoolQ (Raw)} & \multicolumn{2}{c}{ARC-Easy (Norm / Raw)} & \multicolumn{3}{c}{GSM8K Diagnostics} \\
+        \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-12}
+        Condition & Score (\%) & $\Delta$ pp & Score (\%) & $\Delta$ pp & Score (\%) & $\Delta$ pp & Score (\%) & $\Delta$ pp & Trunc. ($n$) & Trunc. (\%) & Unext. \\
+        \midrule
+        Baseline (Qwen3-0.6B) & 43.14 & 0.00 & 47.31 / 37.55 & 0.00 & 64.50 & 0.00 & 55.98 / 60.86 & 0.00 & 14 & 1.06\% & 0 \\
+        Full FT (Midpoint, 625) & 57.24 & +14.10 & 45.78 / 37.11 & -1.53 & 58.65 & -5.84 & 61.74 / 65.15 & +5.77 & 13 & 0.99\% & 0 \\
+        Full FT (Final, 1250) & 64.29 & +21.15 & 45.96 / 37.40 & -1.35 & 58.41 & -6.09 & 62.96 / 65.78 & +6.99 & 9 & 0.68\% & 0 \\
+        Full FT + L2-SP & \textbf{64.67} & \textbf{+21.53} & 46.44 / 37.62 & -0.87 & 63.36 & -1.13 & 63.47 / 66.16 & +7.49 & 12 & 0.91\% & 0 \\
+        LoRA ($r=4$) & 60.35 & +17.21 & 47.36 / 37.56 & +0.05 & 67.09 & +2.60 & 63.01 / 65.19 & +7.03 & 12 & 0.91\% & 0 \\
+        LoRA ($r=16$) & 63.31 & +20.17 & \textbf{47.45} / \textbf{37.83} & \textbf{+0.14} & \textbf{72.02} & \textbf{+7.52} & 64.35 / 66.58 & +8.38 & 6 & 0.45\% & 1 \\
+        OPLoRA ($r=16, k=128$) & 61.64 & +18.50 & 47.33 / 37.77 & +0.02 & 71.62 & +7.13 & \textbf{64.56} / \textbf{67.00} & \textbf{+8.59} & 5 & 0.38\% & 0 \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task1_sft.png}
+        \caption{SFT training loss across all 5 fine-tuning methods.}
+        \label{fig:t1_sft_loss}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task1_l2sp_objective.png}
+        \caption{L2-SP objective decomposition ($\mathcal{L}_{\text{SFT}}$, $\lambda\Omega$, total).}
+        \label{fig:t1_l2sp_obj}
+    \end{subfigure}
+    \caption{Task 1 Training Dynamics. (a) Cross-entropy loss on MetaMathQA response tokens over 1,250 updates. (b) L2-SP objective showing $\mathcal{L}_{\text{SFT}}$, starting-point penalty $\lambda\Omega$, and total loss.}
+    \label{fig:t1_training}
+\end{figure}
+
+\writetodo{Paragraph 1 -- Benchmark Comparisons \& Training Progression (Table~\ref{tab:t1_benchmarks}, Figure~\ref{fig:t1_training}):
+1. The raw accuracy numbers for HellaSwag and ARC-Easy in Table~\ref{tab:t1_benchmarks} from your lm-eval JSON files (the manual requires reporting raw accuracy alongside normalized accuracy).
+2. Discuss Full FT's trajectory from Baseline (43.14\%) to Midpoint (57.24\%, +14.10 pp) to Final (64.29\%, +21.15 pp): note that 66.7\% of the math gain already happens by the midpoint, and almost all of the BoolQ drop (-5.84 pp out of -6.09 pp) also occurs in the first half. Check whether GSM8K gains come from fewer truncations/unextractables or genuinely better reasoning (truncations only drop from 14 to 9, so gains are real).
+3. Perform the 4 required controlled comparisons:
+   (a) Full FT vs.\ Full FT + L2-SP: L2-SP slightly beats Full FT on GSM8K (64.67\% vs 64.29\%) while cutting BoolQ forgetting from -6.09 pp to -1.13 pp. Reference Figure~\ref{fig:t1_l2sp_obj} and explain how anchoring to $\theta_0$ differs from AdamW weight decay toward zero.
+   (b) LoRA-4 vs.\ LoRA-16: Quadrupling rank boosts GSM8K by +2.96 pp (60.35\% to 63.31\%) and BoolQ by +4.92 pp (67.09\% to 72.02\%).
+   (c) LoRA-16 vs.\ OPLoRA-16: Protecting the top $k=128$ singular directions slightly reduces GSM8K adaptation (-1.67 pp, from 63.31\% to 61.64\%) while achieving nearly identical retention on HellaSwag, BoolQ, and ARC-Easy.
+   (d) Full FT vs.\ LoRA-16: Comparable GSM8K gains (+21.15 pp vs +20.17 pp) but dramatically different retention on BoolQ (-6.09 pp vs +7.52 pp). Why did ARC-Easy and BoolQ *increase* under LoRA/OPLoRA? (Hint: step-by-step logical/deductive training on MetaMathQA transfers positively when base representations aren't overwritten).}
+
+\begin{table}[htbp]
+\begin{minipage}[t]{0.53\linewidth}
+    \centering
+    \caption{Task 1 Resource and Parameter Profile.}
+    \label{tab:t1_resources}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{lcccccc}
+        \toprule
+        Method & Trainable & Param \% & Peak VRAM & Wall-Clock & Ckpt Size & $\|\theta - \theta_0\|_2$ \\
+        \midrule
+        Full FT (Mid) & 596.05M & 100.0\% & 15.69 GB & 42.3 min & 7.78 GB & 9.23 \\
+        Full FT (Fin) & 596.05M & 100.0\% & 15.69 GB & 84.7 min & 7.78 GB & 9.735 \\
+        L2-SP & 596.05M & 100.0\% & 18.08 GB & 86.0 min & 7.78 GB & 6.255 \\
+        LoRA-4 & 2.52M & 0.42\% & 4.46 GB & 109.5 min & 30.8 MB & -- \\
+        LoRA-16 & 10.09M & 1.69\% & 4.61 GB & 112.6 min & 121.6 MB & -- \\
+        OPLoRA & 10.09M & 1.69\% & 4.93 GB & 149.8 min & 121.6 MB & -- \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\linewidth}
+    \centering
+    \caption{Layer 13 \texttt{down\_proj} Diagnostics (see Appendix Table~\ref{tab:app_t1_layer_diagnostics} for Layers 0, 13, and 27).}
+    \label{tab:t1_diagnostics}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{lccccc}
+        \toprule
+        Condition & Layer & $\rho_k$ (Subspace) & $\eta$ (Rel. Mag) & $R(z)_{\text{math}}$ & $R(z)_{\text{non-math}}$ \\
+        \midrule
+        Full FT (Mid) & L13 & 0.1482 & 0.0154 & 0.0542 & 0.0306 \\
+        Full FT (Fin) & L13 & 0.1482 & 0.0160 & 0.0547 & 0.0311 \\
+        L2-SP & L13 & 0.1503 & 0.0137 & 0.0456 & 0.0279 \\
+        LoRA-4 & L13 & 0.1437 & 0.0102 & 0.0983 & 0.0146 \\
+        LoRA-16 & L13 & 0.1406 & 0.0181 & 0.0575 & 0.0257 \\
+        OPLoRA & L13 & $\mathbf{7.89\times 10^{-10}}$ & 0.0186 & 0.0616 & 0.0276 \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{minipage}
+\end{table}
+
+\writetodo{Paragraph 2 -- Resources, Weight-Space \& Activation Diagnostics (Tables~\ref{tab:t1_resources}--\ref{tab:t1_diagnostics} and Appendix Table~\ref{tab:app_t1_layer_diagnostics}):
+1. Fill in the Full FT Midpoint displacement $\|\theta - \theta_0\|_2$ in Table~\ref{tab:t1_resources}, and state the exact OPLoRA SVD preprocessing time, basis storage size ($U_k, V_k$), and L2-SP reference storage overhead (+2.39 GB VRAM from keeping frozen $\theta_0$ on GPU: 18.08 GB vs 15.69 GB).
+2. Compare parameter displacement: L2-SP shrinks $\|\theta - \theta_0\|_2$ from 9.735 to 6.255 (-35.7\%) and reduces relative update magnitude $\eta$ across layers 0, 13, and 27 (Table~\ref{tab:app_t1_layer_diagnostics}), yet its subspace interference $\rho_k \approx 0.1503$ is unchanged from Full FT ($0.1482$). Explain what this means: L2-SP scales updates down globally without changing their direction relative to $U_k$.
+3. Contrast LoRA-16 ($\rho_k = 0.1406$) vs.\ OPLoRA ($\rho_k = 7.89\times 10^{-10}$): OPLoRA numerically satisfies the orthogonal constraint to FP32 precision. However, point out that $R(z)_{\text{non-math}}$ is still non-zero for OPLoRA ($0.0276$ in L13) and similar to LoRA-16 ($0.0257$). State the crucial methodological caveat required by the manual: cached-input $R(z)$ only measures the local update at a single matrix and cannot establish a causal link to end-to-end benchmark retention.}
+
+\writetodo{Paragraph 3 -- Qualitative Evaluation of the 42-Response Subset (Appendix~\ref{sec:app_t1_cases}):
+1. Summarize your annotation of the 42 responses (first and last plain questions from \texttt{first\_plot\_questions.yaml} $\times$ 3 formats [plain, JSON, template] $\times$ 7 conditions). Report how many responses complied with JSON/template formatting, exhibited repetition, truncated at 512 tokens, or showed mathematical domain intrusion across the 7 models.
+2. Reference specific aligned excerpts in Appendix~\ref{sec:app_t1_cases} (make sure Appendix~\ref{sec:app_t1_cases} contains the actual first and last prompts from \texttt{first\_plot\_questions.yaml}) and explain how qualitative checks catch formatting degradation that likelihood benchmarks (HellaSwag/BoolQ/ARC-Easy) cannot see because likelihood scoring does not generate free text.}
+
+% =========================================================================
+% SECTION 2: TASK 2 - VISION-LANGUAGE MODELS & VISUAL GROUNDING
+% =========================================================================
+\section{Task 2: Vision-Language Models and Visual Grounding}
+\label{sec:task2}
+
+\subsection{Methodology}
+\label{sec:task2_methodology}
+
+For our Vision-Language Model experiments, we interfaced a frozen \texttt{google/siglip-base-patch16-224} with patch features $F(I) \in \mathbb{R}^{196 \times 768}$. Using frozen base weights for \texttt{Qwen/Qwen3-0.6B}, we mapped visual features into Qwen's embedding space via a two-layer MLP, calibrated by scale factor $0.0504$ on training data to match text embedding norms. For training, example-weighted causal cross-entropy was used over caption/answer and EOT tokens. Visual,prompt and  padding tokens were masked (equations in Appendix~\ref{sec:app_setups}). The experiment was divided into 3 stages with a shared budget of 4,500 updates continuing the same model across stages.
+
+In the first stage (2,250 updates), only the connector was trained for two passes over 18,000 COCO captions. In the second stage (1,500 updates), the connector was trained with LoRA enabled ($r=16, \alpha=32$ on \texttt{q, k, v, o\_proj}), sampling programmatic COCO object presence (50\%), counting 1--4 (25\%), and caption replay (25\%).In the third stage (750 updates), the VLM was trained on Natural VQAv2 complementary pairs with 10\% replay each of presence, counting, and captions.  Finally the model was evaluated on disjoint Grounding and Natural VQAv2 test splits across four image conditions Correct, Complementary Swap, Mismatched, and No Image.
+
+\subsection{Results and Analysis}
+\label{sec:task2_results}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task2_196_loss.png}
+        \caption{196 visual tokens: training loss across stages.}
+        \label{fig:t2_196_loss}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task2_196_development.png}
+        \caption{196 visual tokens: development metrics.}
+        \label{fig:t2_196_dev}
+    \end{subfigure}
+    \caption{Task 2 Training and Development Curves (196 tokens). Vertical lines mark Stage 1 (step 2,250) and Stage 2 (step 3,750) boundaries.}
+    \label{fig:t2_curves}
+\end{figure}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 2 Final Test Evaluation (196 Visual Tokens). Reports accuracy, pair accuracy, identical-answer rate, partner match rate, empty-answer rate, reference NLL, generation time per answer, and correct-vs-swap advantages [95\% CI].}
+    \label{tab:t2_final_eval}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{llccccccccc}
+        \toprule
+        Suite & Image Condition & Acc. & Pair Acc. & Ident. Rate & Partner Match & Empty & Ref.\ NLL & Time/Ans & $\Delta\text{Acc}$ (vs Swap) [95\% CI] & $\Delta\text{NLL}$ (vs Swap) [95\% CI] \\
+        \midrule
+        \textbf{Grounding Test} & Correct & \textbf{0.586} & \textbf{0.375} & 0.297 & 0.188 & 0.00 & \textbf{0.837} & 17.1 & \textbf{+0.398} [0.258, 0.531] & \textbf{+1.535} [1.098, 1.999] \\
+        ($n=128$, 64 pairs) & Comp.\ Swap & 0.188 & 0.031 & 0.297 & 0.586 & 0.00 & 2.373 & 15.4 & -- & -- \\
+        & Mismatched & 0.352 & 0.078 & 0.578 & 0.375 & 0.00 & 1.637 & 15.3 & -- & -- \\
+        & No Image & 0.391 & 0.000 & 1.000 & 0.391 & 0.00 & 3.540 & 13.2 & -- & -- \\
+        \midrule
+        \quad \textit{Presence subsuite} & Correct & 0.812 & 0.688 & 0.250 & 0.188 & 0.00 & 0.366 & 18.7 & +0.625 [0.406, 0.812] & +2.118 [1.553, 2.670] \\
+        \quad \textit{Counting subsuite} & Correct & 0.359 & 0.062 & 0.344 & 0.188 & 0.00 & 1.309 & 15.6 & +0.172 [0.047, 0.297] & +0.952 [0.403, 1.653] \\
+        \midrule
+        \textbf{Natural VQA Test} & Correct & 0.565 & 0.281 & 0.500 & 0.255 & 0.00 & 1.277 & 17.2 & \textbf{+0.261} [0.157, 0.365] & \textbf{+1.435} [1.007, 1.873] \\
+        ($n=192$, 96 pairs) & Comp.\ Swap & 0.304 & 0.042 & 0.500 & 0.526 & 0.00 & 2.712 & 17.5 & -- & -- \\
+        & Mismatched & 0.336 & 0.042 & 0.573 & 0.307 & 0.00 & 2.256 & 17.3 & -- & -- \\
+        & No Image & 0.272 & 0.000 & 1.000 & 0.240 & 0.00 & 4.145 & 39.6 & -- & -- \\
+        \midrule
+        \quad \textit{Yes/No subsuite} & Correct & 0.663 & 0.250 & 0.694 & 0.389 & 0.00 & 0.711 & 15.3 & +0.169 [0.015, 0.324] & +0.467 [0.164, 0.822] \\
+        \quad \textit{Number subsuite} & Correct & 0.608 & 0.417 & 0.333 & 0.188 & 0.00 & 0.978 & 15.4 & +0.402 [0.158, 0.633] & +2.417 [1.423, 3.481] \\
+        \quad \textit{Other subsuite} & Correct & 0.439 & 0.222 & 0.417 & 0.167 & 0.00 & 2.041 & 20.4 & +0.260 [0.110, 0.417] & +1.749 [1.034, 2.542] \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{table}
+
+\writetodo{Paragraph 1 -- Curriculum Progression across Stages 1--3 (Figure~\ref{fig:t2_curves}):
+1. Explain what happens in Figure~\ref{fig:t2_196_loss} and Figure~\ref{fig:t2_196_dev} at each stage boundary:
+   - In Stage 1 (steps 1--2,250, captions only), caption NLL drops sharply by step 500, and VQA answer NLL also drops initially because visual tokens enter the text embedding space, but the image-swap penalty $\Delta\text{NLL}$ stays near zero ($\approx 0.1$--$0.3$). Why? Because captioning alone does not teach the model to answer discriminative questions about specific objects.
+   - At step 2,250 (Stage 2 start: enabling LoRA + presence/counting VQA), training loss drops from $\approx 2.3$ to $\approx 0.8$, Grounding correct-image NLL plummets while swapped-image NLL rises, opening a large positive $\Delta\text{NLL}$ gap.
+   - At step 3,750 (Stage 3 start: Natural VQAv2 specialization), Natural VQA correct NLL drops further and Natural $\Delta\text{NLL}$ increases while replay (10\% each) prevents Grounding and caption losses from regressing.}
+
+\writetodo{Paragraph 2 -- Visual Grounding vs.\ Language Priors & Question Types (Table~\ref{tab:t2_final_eval}, Appendix~\ref{sec:app_t2_cases}):
+1. Compare Correct vs.\ Complementary Swap, Mismatched, and No Image on both suites. Point out the critical distinction from the manual: under No Image, single-example accuracy is still deceptively high (0.445 on Grounding, 0.443 on Natural VQA), because the model outputs the same blind language prior for both images in a pair (Identical Rate = 1.000 on Grounding, 0.708 on Natural), resulting in Pair Accuracy = 0.000 on Grounding!
+2. Contrast this with Complementary Swap: on Grounding, accuracy wrt the original reference drops from 0.586 to 0.188 ($\Delta\text{Acc} = +0.398$, $\Delta\text{NLL} = +1.535$), while Partner Match reaches 0.586 (and 0.563 on Natural VQA). Explain why Partner Match is the smoking gun that the model is actively reading the swapped image's visual content rather than merely getting confused by a perturbed input.
+3. Compare question types: On Grounding, Presence achieves 0.812 accuracy (0.688 pair acc, $\Delta\text{Acc}=+0.625$), whereas Counting struggles at 0.359 accuracy (0.062 pair acc, $\Delta\text{Acc}=+0.172$). On Natural VQA, compare Yes/No (0.708 acc, Identical Rate 0.444), Number (0.479 acc), and Other (0.472 acc, Identical Rate 0.667). Discuss why teacher-forced $\Delta\text{NLL}$ and free-generation $\Delta\text{Acc}$ rank subsuites slightly differently (e.g., Natural Number has a huge $\Delta\text{NLL}=+2.417$ vs Yes/No $+0.467$). Reference your qualitative examples in Appendix~\ref{sec:app_t2_cases} and state your selection rule for picking them.}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 2 Stage-by-Stage Resource Profile and Visual Token Compression (196 vs.\ 49 Tokens). }
+    \label{tab:t2_compression}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{lcccccccc}
+        \toprule
+        Variant & Stage 1 Params & Stage 2--3 Params & Feature Cache & Cache VRAM / Time & Train Time & Peak VRAM & Grounding Acc. & Natural Acc. \\
+        \midrule
+        196 tokens ($14\times 14$) & 1.84M & 6.42M & 2.79 GB & 314 MB / 306.7 s & 53.7 min & 2.88 GB & 58.59\% & 56.51\% \\
+        49 tokens ($2\times 2$ pool) & 1.84M & 6.42M & 0.70 GB & 314 MB / 306.7 s & 34.6 min & 2.04 GB & 57.81\% & 55.47\% \\
+        \midrule
+        Change (49 vs.\ 196) & 0.0\% & 0.0\% & -75.0\% & -- / -- & -35.6\% & -29.2\% & -0.78 pp & -1.04 pp \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{table}
+
+\writetodo{Paragraph 3 -- Computational Cost & Visual Token Compression (Table~\ref{tab:t2_compression}, Appendix Table~\ref{tab:app_t2_49_eval}):
+1. Discuss the resource profile across stages (separating one-time SigLIP feature caching [314 MB VRAM, 306.7 s] from VLM training) and the 196 vs.\ 49 token comparison.
+2. Explain why $2\times 2$ spatial pooling cuts cached feature disk size by 75\% (2.79 GB to 0.70 GB), reduces peak training VRAM by 29.2\% (2.88 GB to 2.04 GB), and speeds up training by 35.6\% (53.7 min to 34.6 min) due to shorter attention sequence lengths in Qwen.
+3. Compare the accuracy trade-off: Natural VQA drops by only -1.04 pp (56.25\% to 55.21\%, pair acc 0.406 to 0.385), whereas Grounding drops by -3.12 pp (58.59\% to 55.47\%, pair acc 0.375 to 0.328). Explain why spatial pooling hurts fine-grained object counting/localization more than coarse global scene questions.}
+
+% =========================================================================
+% SECTION 3: TASK 3 - TEST-TIME COMPUTE
+% =========================================================================
+\section{Task 3: Test-Time Compute: Sampling, Selection, and Adaptive Inference}
+\label{sec:task3}
+
+\subsection{Methodology}
+\label{sec:task3_methodology}
+
+In order to evaluate the relationship between spending extra compute during inference and answer quality, we evaluated 32-rollout pools across 1,000 questions (200 dev and 800 evaluation) on \texttt{Qwen2.5-3B-Instruct} for MATH and \texttt{Qwen2.5-VL-3B-Instruct} for MathVista. We averaged outcomes across 10 nested prefix permutations for budgets $N \in \{1, 2, 4, 8, 16, 32\}$. Equivalent answers were normalized before voting, and unextracted outputs were mapped to \texttt{NO\_ANSWER}. Rollouts were scored using four quality scores: Mean Log-Probability, Self-Certainty, Visual Engagement (for MathVista only), and VisConf (MathVista only) (full equations in Appendix~\ref{sec:app_setups}). We compared Best-of-$N$ against unweighted majority voting and Rank-Weighted Consensus, which ranks the $N$ candidates from $r_i = 1$ (best) to $N$ (worst), assigns descending weights $w_i = \frac{N - r_i}{N - 1}$, and picks the answer with the largest total weight $\hat{a} = \arg\max_a \sum_{i: a_i = a} w_i$. At $N=32$, the failures were split into sampling and selection failures. Three live strategies were evaluated under a 3,072-token budget on 50 MATH evaluation questions: Single Longer ($1 \times 3,072$ tokens), Parallel Sampling ($3 \times 1,024$ tokens with Self-Consistency), and Sequential Refinement (reusing the first $1,024$-token response followed by a $2,048$-token self-critique and revision pass without gold feedback). Finally, early stopping after $n \in \{4, 8, 16\}$ rollouts was implemented using an Agreement-Based policy and a Quality-Aware policy with thresholds $\tau$ and $\gamma$ tuned on the 200 development questions.
+
+\subsection{Results and Analysis}
+\label{sec:task3_results}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task3_math_accuracy_vs_N.png}
+        \caption{MATH: Accuracy vs.\ $N$.}
+        \label{fig:t3_math_n}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task3_math_accuracy_vs_tokens.png}
+        \caption{MATH: Accuracy vs.\ Tokens.}
+        \label{fig:t3_math_tokens}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task3_math_oracle_vs_N.png}
+        \caption{MATH: Oracle Coverage vs.\ $N$.}
+        \label{fig:t3_math_oracle}
+    \end{subfigure}
+    \caption{Task 3 Scaling Behavior on MATH ($n=800$ Held-Out Problems; see Appendix Figure~\ref{fig:app_t3_mv_curves} for MathVista).}
+    \label{fig:t3_math_curves}
+\end{figure}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 3 Offline Evaluation across Candidate Budgets ($n=800$ Held-Out Set). Reports accuracy (\%), error decomposition into sampling vs.\ selection failure at $N=32$, and within-question top-vs-bottom quartile correctness gap ($\Delta Q_{4-1}$ at $N=32$).}
+    \label{tab:t3_offline_methods}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{llcccccccc}
+        \toprule
+        Dataset & Method & $N=1$ & $N=2$ & $N=4$ & $N=8$ & $N=16$ & $N=32$ & Samp / Sel Fail ($N=32$) & Quartile $\Delta Q_{4-1}$ \\
+        \midrule
+        \textbf{MATH} & FirstAns (Baseline) & 63.88\% & 63.88\% & 63.88\% & 63.88\% & 63.88\% & 63.88\% & 8.88\% / 27.25\% & -- \\
+        (LLM, 3B) & Mean Log-Probability & 63.88\% & 65.58\% & 67.45\% & 67.11\% & 66.29\% & 63.88\% & 8.88\% / 27.25\% & +7.88 pp \\
+        & Self-Certainty & 63.88\% & 66.31\% & 68.38\% & 69.84\% & 70.99\% & 70.38\% & 8.88\% / 20.75\% & +11.95 pp \\
+        & Self-Consistency (SC) & 63.88\% & 63.88\% & 68.66\% & 71.76\% & 73.13\% & 73.66\% & 8.88\% / 17.46\% & -- \\
+        & Self-Certainty + RWC & 63.88\% & 66.31\% & 69.51\% & 73.05\% & 74.30\% & \textbf{75.29\%} & 8.88\% / \textbf{15.84\%} & -- \\
+        & Shortest-Rollout Control & -- & -- & -- & -- & -- & 62.11\% & 8.88\% / 29.01\% & -4.53 pp \\
+        & \textit{Oracle Coverage} & 63.88\% & 72.15\% & 78.94\% & 83.78\% & 87.96\% & \textit{91.13\%} & -- & -- \\
+        \midrule
+        \textbf{MathVista} & FirstAns (Baseline) & 53.15\% & 53.15\% & 53.15\% & 53.15\% & 53.15\% & 53.15\% & 10.50\% / 36.35\% & -- \\
+        (VLM, 3B) & Mean Log-Probability & 53.15\% & 53.93\% & 53.21\% & 51.90\% & 50.74\% & 48.13\% & 10.50\% / 41.38\% & +1.59 pp \\
+        & Vision-Only (Best / RWC) & 53.15\% & 53.23\% & 53.71\% & 54.15\% & 53.56\% & 53.63\% / 63.88\% & 10.50\% / 35.88\% & +3.78 pp \\
+        & VisConf (Best) & 53.15\% & 54.34\% & 56.29\% & 56.68\% & 56.65\% & 57.75\% & 10.50\% / 31.75\% & +7.39 pp \\
+        & Self-Consistency (SC) & 53.15\% & 53.15\% & 57.93\% & 60.63\% & 62.40\% & 63.00\% & 10.50\% / 26.50\% & -- \\
+        & Self-Certainty + RWC & 53.15\% & 54.41\% & 56.91\% & 60.39\% & 62.54\% & 63.80\% & 10.50\% / 25.70\% & -- \\
+        & VisConf + RWC & 53.15\% & 54.89\% & 57.20\% & 61.03\% & 62.94\% & \textbf{64.50\%} & 10.50\% / \textbf{25.00\%} & -- \\
+        & Tokenwise Fusion + RWC & -- & -- & -- & -- & -- & 63.88\% & 10.50\% / 25.63\% & +7.23 pp \\
+        & Shortest-Rollout Control & -- & -- & -- & -- & -- & 53.80\% & 10.50\% / 35.70\% & -3.94 pp \\
+        & \textit{Oracle Coverage} & 53.15\% & 65.88\% & 75.48\% & 82.25\% & 86.76\% & \textit{89.50\%} & -- & -- \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{table}
+
+\writetodo{Paragraph 1 -- Exploration Ceiling vs.\ Selection Bottleneck & Signal Analysis (Table~\ref{tab:t3_offline_methods}, Figure~\ref{fig:t3_math_curves}, Appendix Figure~\ref{fig:app_t3_mv_curves}):
+1. Fill in the missing cells in Table~\ref{tab:t3_offline_methods}: MathVista `Vision-Only + RWC` and `Self-Certainty + RWC` (explicitly required by Step 2: "Both datasets: ... self-certainty + RWC. MathVista additionally: vision-only and VisConf, each with highest-score selection and RWC"), plus the Step 3 top-vs-bottom quartile correctness gaps ($\Delta Q_{4-1}$) and 1,000-bootstrap 95\% CIs on main accuracy differences (e.g., Self-Certainty + RWC vs.\ SC on MATH, VisConf + RWC vs.\ SC on MathVista). Also report the number of distinct answer groups as $N$ grows.
+2. Contrast Oracle Coverage (rising from 63.88\% to 91.13\% on MATH and 53.15\% to 89.50\% on MathVista) with achieved selection accuracy. Point out the error decomposition at $N=32$: sampling failure is only 8.88\% (MATH) and 10.50\% (MathVista), whereas selection failure is 15.84\%--27.25\% (MATH) and 25.00\%--41.38\% (MathVista). This proves candidate recognition---not generation diversity---is the dominant bottleneck at higher budgets.
+3. Explain why Mean Log-Probability degrades as $N$ grows (peaking at $N=4$ on MATH at 67.45\% before falling back to 63.88\% at $N=32$, and dropping below baseline to 48.13\% on MathVista), whereas Self-Certainty ($K_i$) rises to 70.38\% and VisConf rises to 57.75\%. Connect this to your Step 3 length/quartile analysis and Shortest-Rollout Control (62.11\% on MATH, 53.80\% on MathVista).
+4. Compare Trajectory-level VisConf ($Z_i$, 64.50\% with RWC) vs.\ Tokenwise Fusion ($Z_i^{\text{token}}$, 63.88\% with RWC) using the identity $Z_i^{\text{token}} - Z_i = \operatorname{Cov}_t(c_{i,t}, v_{i,t})$. Report your summary of within-rollout confidence-vision correlations across questions and reference the illustrative token trajectories in Appendix Figure~\ref{fig:app_trajectories}.}
+
+\begin{table}[htbp]
+\begin{minipage}[t]{0.52\linewidth}
+    \centering
+    \caption{Live Inference Strategy Comparison (50 MATH Questions, 3,072-Token Allowance).}
+    \label{tab:t3_live}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{lccccccc}
+        \toprule
+        Strategy & Acc. & In / Out Tok. & Time (s) & VRAM & Trunc. & Unext. & W$\rightarrow$C / C$\rightarrow$W \\
+        \midrule
+        Single Longer & 58.0\% & 5,419 / 32,352 & 798.5 & 5.82 GB & 0 & 0\% & -- \\
+        Parallel ($3\times$) & \textbf{60.0\%} & 16,257 / 91,706 & 2265.5 & 5.80 GB & 24 & 16\% & -- \\
+        Refinement & 58.0\% & 43,408 / 60,832 & 1504.6 & 5.89 GB & 11 & 4\% & 1 / 2 (Net -1) \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\linewidth}
+    \centering
+    \caption{Adaptive Sampling Policy Evaluation ($n=800$). }
+    \label{tab:t3_adaptive}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{llcccccc}
+        \toprule
+        Dataset & Policy ($\tau/\gamma$) & Acc. & Tokens & Rollouts & Savings & Stop \% (4/8/16/32) \\
+        \midrule
+        \textbf{MATH} & Fixed-32 & 73.66\% & 21,390 & 32.0 & 0.0\% & 0/0/0/100 \\
+        & Agree (0.625/--) & 73.49\% & 10,197 & 11.9 & 52.2\% & 66.5 / 5.4 / 1.3 / 26.8 \\
+        & Qual (0.5/0.1) & 72.71\% & \textbf{7,587} & \textbf{8.9} & \textbf{64.5\%} & 76.8 / 5.9 / 1.3 / 16.0 \\
+        \midrule
+        \textbf{MathVista} & Fixed-32 & 63.00\% & 8,905 & 32.0 & 0.0\% & 0/0/0/100 \\
+        & Agree (0.625/--) & 62.61\% & 4,571 & 13.5 & 48.6\% & 57.8 / 8.6 / 1.7 / 31.9 \\
+        & Qual (0.5/0.1) & 62.40\% & \textbf{4,051} & \textbf{12.3} & \textbf{54.5\%} & 59.5 / 10.4 / 3.7 / 26.4 \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{minipage}
+\end{table}
+
+\writetodo{Paragraph 2 -- Live Inference: Breadth vs.\ Depth & Sequential Refinement (Table~\ref{tab:t3_live}, Appendix~\ref{sec:app_t3_cases}):
+1. Fill in Peak GPU Memory in Table~\ref{tab:t3_live} and confirm that the shared first parallel response is charged to both Parallel ($3\times$) and Refinement in your token/runtime numbers.
+2. Compare the three strategies: Single Longer achieves 58.0\% with 0 truncations because the 3,072 cap gives long CoT derivations room to finish, using only 32,352 output tokens (mean $\approx 647$ tokens/question). Parallel ($3\times 1,024$) reaches the highest accuracy (60.0\%) via self-consistency voting, but the tighter 1,024-token per-rollout cap causes 24 truncations (16\% unextractable rate) and costs $2.83\times$ more output tokens (91,706).
+3. Analyze Sequential Refinement (58.0\%): It consumes $8\times$ more input tokens than Single Longer (43,408 vs 5,419) because the entire initial rollout is re-prefilled as context, yet yields a net negative transition (1 Wrong$\rightarrow$Correct vs.\ 2 Correct$\rightarrow$Wrong, Net -1). Reference your qualitative example in Appendix~\ref{sec:app_t3_cases} to explain why unverified self-critique sycophantically second-guesses valid solutions.}
+
+\writetodo{Paragraph 3 -- Adaptive Sampling & Recoverable Early Stops (Table~\ref{tab:t3_adaptive}, Appendix~\ref{sec:app_t3_cases}):
+1. Fill in the stopping-count distribution (\% of questions stopping at $n=4, 8, 16, 32$) in Table~\ref{tab:t3_adaptive}.
+2. Compare adaptive policies against Fixed-32 AND against fixed-$N$ budgets at similar rollout/token costs (e.g., on MATH, Quality-Aware uses 8.9 mean rollouts and achieves 72.71\%, which beats Fixed-$N=8$ SC [71.76\%] and approaches Fixed-$N=16$ SC [73.13\%] at nearly half the cost!). Explain why allocating 4 rollouts to easy questions (high early agreement + RWC margin) and 16--32 rollouts to hard questions outperforms uniform allocation.
+3. Discuss premature stopping failures: analyze how often an early stop is wrong when Fixed-32 SC would have recovered the right answer (reference the recoverable error case study in Appendix~\ref{sec:app_t3_cases}) and relate stopping behavior to the retrospective fraction of correct candidates in the full 32-rollout pool.}
+
+% =========================================================================
+% SECTION 4: CROSS-TASK DISCUSSION
+% =========================================================================
+\section{Discussion (Cross-Task Synthesis)}
+\label{sec:discussion}
+
+\subsection{RQ1: Specialization and Retention vs.\ Exploration and Selection}
+\writetodo{Compare weight modification (Task 1) with test-time search (Task 3):
+- In Task 1, updating weights on MetaMathQA shifts single-pass greedy GSM8K accuracy from 43.14\% to 64.67\% (+21.53 pp) at zero extra inference cost, but risks catastrophic forgetting on BoolQ (-6.09 pp under unregularized Full FT).
+- In Task 3, weights stay frozen (zero forgetting risk on unrelated tasks) and scaling $N=1 \rightarrow 32$ raises MATH accuracy from 63.88\% to 75.29\% (+11.41 pp) at the cost of $8.9\times$ to $32\times$ more inference tokens.
+- Synthesize the trade-off: when the base model lacks domain competence entirely (like Task 2 before connector alignment), parameter adaptation is mandatory; when the capability already exists in the base distribution (91.13\% oracle coverage on MATH), test-time selection extracts it safely without parameter drift.}
+
+\subsection{RQ2: Restrictions on Adaptation and Visual Grounding}
+\writetodo{Connect structural parameter constraints across Task 1 (L2-SP, LoRA-4/16, OPLoRA) and Task 2 (frozen SigLIP + MLP connector + stage-wise LoRA):
+- Contrast how L2-SP restricts global Euclidean norm ($\|\theta-\theta_0\|_2$: 9.735 $\rightarrow$ 6.255), LoRA restricts update rank ($r \in \{4,16\}$), and OPLoRA restricts subspace overlap ($\rho_k \approx 10^{-10}$).
+- Explain why Task 2 freezes Qwen completely during Stage 1 (forcing the MLP connector to align SigLIP patches to Qwen's existing embedding space first) before unlocking rank-16 LoRA on attention projections in Stages 2--3. What would happen if Qwen's full weights were unfrozen in Stage 1 on 18,000 short COCO captions? (Catastrophic language degradation and overfitting to language priors).}
+
+\subsection{RQ3: Parameter Changes, Visual Usage, and Generation Refinement}
+\writetodo{Synthesize what internal signals and diagnostics reveal vs.\ what they cannot prove across all three tasks:
+- Task 1: Weight-space $\rho_k, \eta$ and local activation $R(z)$ verify whether updates avoid dominant singular directions, but local probe activations do not capture multi-layer cascade effects.
+- Task 2: Teacher-forced $\Delta\text{NLL}$ (+1.535 on Grounding), free-generation $\Delta\text{Acc}$ (+0.398), and Partner Match (0.586) jointly distinguish true visual conditioning from blind language priors.
+- Task 3: Distributional self-certainty ($K_i$) and calibrated visual engagement (VisConf $Z_i$) reliably rank reasoning chains when combined with consensus (RWC), whereas raw token logp favors degenerate short outputs and unverified self-refinement hallucinates errors.}
+
+\subsection{RQ4: Performance vs.\ Computational Cost}
+\writetodo{Compare the compute-performance Pareto frontier across training and inference:
+- Task 1: LoRA-16 cuts peak VRAM by 70.6\% (4.61 GB vs 15.69 GB) and checkpoint storage by 98.4\% (121.6 MB vs 7.78 GB) while beating Full FT on retention and coming within 0.98 pp on GSM8K; OPLoRA adds 37.2 min of training time for SVD projection without outperforming LoRA-16 on these benchmarks.
+- Task 2: $2\times 2$ token pooling (196 $\rightarrow$ 49 tokens) saves 35.6\% training time and 29.2\% VRAM for only a 1.04 pp drop on Natural VQA.
+- Task 3: Quality-aware adaptive stopping saves 64.5\% tokens on MATH and 54.5\% on MathVista while staying within $<1.0$ pp of Fixed-32 accuracy, whereas live sequential refinement doubles latency and input tokens for zero accuracy gain.}
+
+\subsection{RQ5: Behavior Beyond Benchmark Scores \& Reliability}
+\writetodo{Highlight how top-line accuracy masks critical failure modes across all three tasks:
+- Task 1: Aggregate likelihood accuracy on HellaSwag/BoolQ misses JSON schema breakage and mathematical phrasing intrusion on plain conversational prompts (seen in the 42-response qualitative study).
+- Task 2: Single-image accuracy makes the blind No-Image baseline look competitive (44.5\%), hiding the fact that its Pair Accuracy is 0.0\% and Identical Answer Rate is 100.0\%.
+- Task 3: High token log-probability masks trivial/short errors, and early majority agreement at $n=4$ can lock in common misconceptions (recoverable errors).}
+
+% =========================================================================
+% SECTION 5: CONCLUSION & LIMITATIONS
+% =========================================================================
+\section{Conclusion and Limitations}
+\label{sec:conclusion}
+\writetodo{Write a concise 1-paragraph conclusion and 1-paragraph limitations section in your own words:
+- Summarize the three main takeaways from Tasks 1, 2, and 3 with concrete numbers.
+- State key experimental limitations: single random seed (6304), sub-1B/3B model scale, local VQA subsets rather than full test-dev servers, cached single-layer activation probes in Task 1, and offline generated-token proxies in Task 3 that exclude prefill, KV-cache memory, and all-layer attention extraction overhead.}
+
+% =========================================================================
+% REFERENCES (Page 9 - Does not count toward 8-page limit)
+% =========================================================================
+\clearpage
+\begin{thebibliography}{99}
+
+\bibitem{li2018explicit}
+Xuhong Li, Yves Grandvalet, and Fran{\c{c}}ois Davoine.
+\newblock Explicit inductive bias for transfer learning with convolutional networks.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, pages 2825--2834, 2018.
+
+\bibitem{hu2022lora}
+Edward~J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu~Wang, and Weizhu Chen.
+\newblock {LoRA}: Low-rank adaptation of large language models.
+\newblock In \emph{International Conference on Learning Representations (ICLR)}, 2022.
+
+\bibitem{xiong2025oplora}
+Y.~Xiong and S.~Xie.
+\newblock {OPLoRA}: Orthogonal projection low-rank adaptation for language models.
+\newblock \emph{arXiv preprint}, 2025.
+
+\bibitem{zhai2023sigmoid}
+Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, and Lucas Beyer.
+\newblock Sigmoid loss for language image pre-training.
+\newblock In \emph{Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)}, pages 11975--11986, 2023.
+
+\bibitem{liu2023visual}
+Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong~Jae Lee.
+\newblock Visual instruction tuning.
+\newblock In \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2023.
+
+\bibitem{goyal2017making}
+Yash Goyal, Tejas Khot, Douglas Summers-Stay, Dhruv Batra, and Devi Parikh.
+\newblock Making the {V} in {VQA} matter: Elevating the role of image understanding in visual question answering.
+\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, pages 6904--6913, 2017.
+
+\bibitem{kang2024scalable}
+Z.~Kang et~al.
+\newblock Scalable best-of-{N} selection for large language models via self-certainty.
+\newblock \emph{arXiv preprint}, 2024.
+
+\bibitem{usman2025visconf}
+M.~Usman et~al.
+\newblock {VisConf}: Quality-aware consensus for best-of-{N} in vision-language model reasoning.
+\newblock \emph{arXiv preprint}, 2025.
+
+\bibitem{wang2023selfconsistency}
+Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc~V. Le, Ed~H. Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou.
+\newblock Self-consistency improves chain of thought reasoning in language models.
+\newblock In \emph{International Conference on Learning Representations (ICLR)}, 2023.
+
+\bibitem{madaan2023self}
+Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler Hallinan, Luyu Gao, Sarah Wiegreffe, Uri Alon, Nouha Dziri, Shrimai Prabhumoye, Yiming Yang, et~al.
+\newblock Self-refine: Iterative refinement with self-feedback.
+\newblock In \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2023.
+
+\end{thebibliography}
+
+% =========================================================================
+% APPENDICES A–E (Pages 10+ - Supplementary Material)
+% =========================================================================
+\clearpage
+\appendix
+
+\section{Experimental Setups and Hyperparameter Configurations}
+\label{sec:app_setups}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 1 Fine-Tuning Setup: Model, Optimization, Data Splits, and Evaluation Configuration.}
+    \label{tab:app_t1_setup}
+    \small
+    \begin{tabular}{ll}
+        \toprule
+        Setting & Value \\
+        \midrule
+        Base Policy & \texttt{Qwen/Qwen3-0.6B} (original post-trained weights, non-thinking mode) \\
+        Training Dataset & MetaMathQA (first 40,000 eligible examples in source order) \\
+        Filtering Rules & Exclude empty, length $> 2,048$ tokens, or normalized GSM8K test overlap \\
+        Effective Batch Size & Microbatch 2 $\times$ gradient accumulation 16 = 32 examples per update \\
+        Optimizer & AdamW ($\beta_1=0.9, \beta_2=0.999, \epsilon=10^{-8}$, weight decay $0.01$) \\
+        Learning Rate Schedule & Cosine decay with 38 warmup updates (Full FT: peak $2\times 10^{-5}$; LoRA: peak $2\times 10^{-4}$) \\
+        Precision & FP16 autocast with FP32 master weights (Full FT) or FP32 adapters (LoRA/OPLoRA) \\
+        Gradient Clipping & Global norm 1.0; gradient checkpointing enabled \\
+        LoRA Configuration & Target \texttt{q, k, v, o, gate, up, down\_proj}; $r \in \{4, 16\}, \alpha=2r$, dropout $0.05$ \\
+        OPLoRA Configuration & $r=16, \alpha=32$, protection rank $k=128$, FP32 SVD bases $U_k, V_k$ on $W_0$ \\
+        Evaluation Benchmarks & GSM8K (test 1,319), HellaSwag (val 10,042), BoolQ (val 3,270), ARC-Easy (test 2,376) \\
+        Seed & 6304 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 2 VLM Architecture, 3-Stage Curriculum, and Evaluation Setup.}
+    \label{tab:app_t2_setup}
+    \small
+    \begin{tabular}{ll}
+        \toprule
+        Setting & Value \\
+        \midrule
+        Vision Encoder & \texttt{google/siglip-base-patch16-224} (frozen, FP16, $14\times 14 = 196$ patch tokens) \\
+        Connector Architecture & $\text{Linear}(768\rightarrow 1024) \rightarrow \text{GELU} \rightarrow \text{Linear}(1024\rightarrow 1024)$, calibrated scale $0.0504$ \\
+        Language Backbone & \texttt{Qwen/Qwen3-0.6B} (frozen base weights, LoRA enabled in Stages 2--3) \\
+        Stage 1 (Updates 1--2,250) & 18,000 COCO captions (2 passes), $LR_{\text{connector}}=10^{-3}$, connector only \\
+        Stage 2 (Updates 2,251--3,750) & Presence (50\%), Counting (25\%), Caption Replay (25\%); $LR_{\text{conn}}=10^{-4}, LR_{\text{LoRA}}=2\times 10^{-5}$ \\
+        Stage 3 (Updates 3,751--4,500) & Natural VQA (70\%), Presence (10\%), Counting (10\%), Caption (10\%); $LR_{\text{conn}}=5\times 10^{-5}, LR_{\text{LoRA}}=10^{-5}$ \\
+        Batch Configuration & Microbatch 8 $\times$ accumulation 2 = effective batch 16 examples \\
+        Token Caps & Question 80 tokens, Caption target 64 tokens, Short-answer target 16 tokens \\
+        Evaluation Suites & Grounding Test (64 pairs, val2014); Natural VQA Test (96 pairs, val2014) \\
+        Image Controls & Correct, Complementary swap, Mismatched, No image \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 3 Test-Time Compute Rollout, Scoring, and Adaptive Controller Setup.}
+    \label{tab:app_t3_setup}
+    \small
+    \begin{tabular}{ll}
+        \toprule
+        Setting & Value \\
+        \midrule
+        LLM Model / Dataset & \texttt{Qwen/Qwen2.5-3B-Instruct} on MATH test subset (1,000 questions, 32 rollouts each) \\
+        VLM Model / Dataset & \texttt{Qwen/Qwen2.5-VL-3B-Instruct} on MathVista testmini (1,000 questions, 32 rollouts each) \\
+        Generation Parameters & Temperature 0.7, top-$p$ 0.8, top-$k$ 20, repetition penalty 1.0, max tokens 2,048 \\
+        Data Splits & 200 development questions, 800 held-out evaluation questions (seed 6304 shuffle) \\
+        Scoring Functions & Logp $L_i$, Self-Certainty $K_i$, Visual Engagement $V_i$, VisConf $Z_i$, Tokenwise Fusion $Z_i^{\text{token}}$ \\
+        Consensus Aggregation & Majority voting (Self-Consistency) vs Rank-Weighted Consensus (RWC) \\
+        Live Evaluation (50 MATH) & Single longer (3,072) vs Parallel ($3\times 1,024$) vs Refinement ($1,024 + 2,048$) \\
+        Adaptive Grid Search & Agreement $\tau \in \{0.5, 0.625, 0.75, 0.875, 1.0\}$, Quality margin $\gamma \in \{0, 0.1, 0.25, 0.5\}$ \\
+        Stopping Budgets & Evaluated after $n \in \{4, 8, 16\}$ rollouts, with fixed fallback at 32 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{Formulations Across Tasks 1--3.}
+For Task~1, post-training optimizes $\min_\theta \mathcal{L}_{\text{SFT}}(\theta) + \lambda\Omega(\theta,\theta_0)$ with $\theta - \theta_0 \in \mathcal{S}$, where L2-SP sets $\Omega(\theta,\theta_0) = \frac{1}{2}\sum_{j=1}^P (\theta_j - \theta_{0,j})^2$, LoRA sets $\Delta W = \frac{\alpha}{r}BA$, and OPLoRA projects $\tilde{B} = B - U_k(U_k^\top B)$ and $\tilde{A} = A - (A V_k)V_k^\top$ before forming $\Delta W = \frac{\alpha}{r}\tilde{B}\tilde{A}$. Diagnostics on \texttt{down\_proj} compute $\rho_k = \|U_k U_k^\top \Delta W\|_F^2 / \|\Delta W\|_F^2$, $\eta = \|\Delta W\|_F / \|W_0\|_F$, and $R(z) = \|\Delta W z\|_2 / (\|W_0 z\|_2 + 10^{-8})$. For Task~2, the connector maps $F(I) \in \mathbb{R}^{196 \times 768}$ to $Z(I) = g_\phi(F(I)) \in \mathbb{R}^{196 \times 1024}$ under example-weighted cross-entropy $\mathcal{L} = -\frac{1}{|B|}\sum_{i \in B}\frac{1}{|R_i|}\sum_{t \in R_i} \log p(y_{i,t} \mid I_i, q_i, y_{i,<t})$, with image-swap penalty $\Delta\text{NLL} = \text{NLL}(y \mid q, I_{\text{partner}}) - \text{NLL}(y \mid q, I_{\text{correct}})$. For Task~3, rollout-$i$ quality scores over $T_i$ generated tokens are defined as:
+\begin{align}
+L_i &= \frac{1}{T_i}\sum_{t=1}^{T_i} \log p_{i,t}(y_{i,t}), \qquad
+K_i = \frac{1}{T_i}\sum_{t=1}^{T_i} k_{i,t}, \quad k_{i,t} = D_{\text{KL}}(U \parallel p_{i,t}), \\
+v_{i,t} &= \frac{A_{i,t}^{\text{image}}}{A_{i,t}^{\text{image}} + A_{i,t}^{\text{prompt}} + A_{i,t}^{\text{generated}}}, \qquad V_i = \frac{1}{T_i}\sum_{t=1}^{T_i} v_{i,t}, \\
+c_{i,t} &= \operatorname{clip}_{[0,1]}\!\left(\frac{k_{i,t} - Q_{.05}(G)}{\max(Q_{.95}(G) - Q_{.05}(G), 10^{-8})}\right), \qquad C_i = \frac{1}{T_i}\sum_{t=1}^{T_i} c_{i,t}, \\
+Z_i &= V_i C_i, \qquad Z_i^{\text{token}} = \frac{1}{T_i}\sum_{t=1}^{T_i} c_{i,t} v_{i,t} = Z_i + \operatorname{Cov}_t(c_{i,t}, v_{i,t}).
+\end{align}
+
+% -------------------------------------------------------------------------
+\section{Task 1 Supplementary Results and Diagnostics}
+\label{sec:app_t1_supp}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Full Layer-by-Layer Diagnostics for \texttt{down\_proj} Across Layers 0, 13, and 27. Reports subspace interference ratio $\rho_k$, relative update magnitude $\eta$, and mean activation ratio $R(z)$ on GSM8K math vs.\ HellaSwag non-math inputs.}
+    \label{tab:app_t1_layer_diagnostics}
+    \small
+    \begin{tabular}{lcccccc}
+        \toprule
+        Condition & Layer & $\rho_k$ (Subspace) & $\eta$ (Rel. Mag) & $R(z)_{\text{math}}$ (Mean) & $R(z)_{\text{non-math}}$ (Mean) & $R(z)$ Ratio (M / NM) \\
+        \midrule
+        Full FT (Final) & Layer 0 & 0.1329 & 0.0136 & 0.0517 & 0.0263 & 1.97$\times$ \\
+        & Layer 13 & 0.1482 & 0.0160 & 0.0547 & 0.0311 & 1.76$\times$ \\
+        & Layer 27 & 0.1130 & 0.0129 & 0.0201 & 0.0280 & 0.72$\times$ \\
+        \midrule
+        Full FT (Midpoint) & Layer 0 & 0.1330 & 0.0131 & 0.0500 & 0.0255 & 1.96$\times$ \\
+        & Layer 13 & 0.1482 & 0.0154 & 0.0542 & 0.0306 & 1.77$\times$ \\
+        & Layer 27 & 0.1135 & 0.0124 & 0.0202 & 0.0281 & 0.72$\times$ \\
+        \midrule
+        Full FT + L2-SP & Layer 0 & 0.1336 & 0.0111 & 0.0440 & 0.0225 & 1.95$\times$ \\
+        & Layer 13 & 0.1503 & 0.0137 & 0.0456 & 0.0279 & 1.63$\times$ \\
+        & Layer 27 & 0.1071 & 0.0079 & 0.0192 & 0.0259 & 0.74$\times$ \\
+        \midrule
+        LoRA ($r=4$) & Layer 0 & 0.1330 & 0.0091 & 0.0560 & 0.0161 & 3.47$\times$ \\
+        & Layer 13 & 0.1437 & 0.0102 & 0.0983 & 0.0146 & 6.71$\times$ \\
+        & Layer 27 & 0.1090 & 0.0069 & 0.0053 & 0.0072 & 0.74$\times$ \\
+        \midrule
+        LoRA ($r=16$) & Layer 0 & 0.1399 & 0.0147 & 0.0452 & 0.0297 & 1.52$\times$ \\
+        & Layer 13 & 0.1406 & 0.0181 & 0.0575 & 0.0257 & 2.23$\times$ \\
+        & Layer 27 & 0.1153 & 0.0117 & 0.0098 & 0.0156 & 0.63$\times$ \\
+        \midrule
+        OPLoRA ($r=16, k=128$) & Layer 0 & $9.04\times 10^{-10}$ & 0.0150 & 0.0525 & 0.0292 & 1.80$\times$ \\
+        & Layer 13 & $7.89\times 10^{-10}$ & 0.0186 & 0.0616 & 0.0276 & 2.23$\times$ \\
+        & Layer 27 & $1.64\times 10^{-9}$ & 0.0095 & 0.0096 & 0.0153 & 0.63$\times$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% -------------------------------------------------------------------------
+\section{Task 2 Supplementary Results and Stratifications}
+\label{sec:app_t2_supp}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task2_49_loss.png}
+        \caption{49 visual tokens: training loss across stages.}
+        \label{fig:app_t2_49_loss}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task2_49_development.png}
+        \caption{49 visual tokens: development metrics.}
+        \label{fig:app_t2_49_dev}
+    \end{subfigure}
+    \caption{Task 2 Training and Development Dynamics for the 49-Visual-Token Variant ($2\times 2$ spatial pooling).}
+    \label{fig:app_t2_49_curves}
+\end{figure}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Task 2 Grounding and Natural VQA Test Evaluation for 49 Visual Tokens Across All Conditions.}
+    \label{tab:app_t2_49_eval}
+    \small
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{llccccccc}
+        \toprule
+        Suite & Image Condition & Accuracy & Pair Acc. & Identical Rate & Partner Match & Ref.\ NLL & $\Delta\text{Acc}$ (vs Swap) & $\Delta\text{NLL}$ (vs Swap) \\
+        \midrule
+        \textbf{Grounding Test} & Correct & 0.578 & 0.391 & 0.328 & 0.250 & 0.929 & +0.328 & +0.964 \\
+        ($n=128$, 49 tokens) & Complementary Swap & 0.250 & 0.062 & 0.328 & 0.578 & 1.892 & -- & -- \\
+        & Mismatched & 0.398 & 0.156 & 0.516 & 0.328 & 1.523 & -- & -- \\
+        & No Image & 0.391 & 0.000 & 1.000 & 0.391 & 1.872 & -- & -- \\
+        \midrule
+        \textbf{Natural VQA Test} & Correct & 0.555 & 0.240 & 0.510 & 0.281 & 1.308 & +0.224 & +0.840 \\
+        ($n=192$, 49 tokens) & Complementary Swap & 0.331 & 0.031 & 0.510 & 0.505 & 2.149 & -- & -- \\
+        & Mismatched & 0.378 & 0.042 & 0.573 & 0.286 & 2.249 & -- & -- \\
+        & No Image & 0.331 & 0.000 & 1.000 & 0.297 & 2.597 & -- & -- \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{table}
+
+% -------------------------------------------------------------------------
+\section{Task 3 Supplementary Results, Trajectories, and Grids}
+\label{sec:app_t3_supp}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task3_mathvista_accuracy_vs_N.png}
+        \caption{MathVista: Accuracy vs.\ $N$.}
+        \label{fig:app_t3_mv_n}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task3_mathvista_accuracy_vs_tokens.png}
+        \caption{MathVista: Accuracy vs.\ Tokens.}
+        \label{fig:app_t3_mv_tokens}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.32\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/task3_mathvista_oracle_vs_N.png}
+        \caption{MathVista: Oracle Coverage vs.\ $N$.}
+        \label{fig:app_t3_mv_oracle}
+    \end{subfigure}
+    \caption{Task 3 Scaling Behavior on MathVista ($n=800$ Held-Out Problems). Evaluates selection methods, token efficiency, and oracle bounds.}
+    \label{fig:app_t3_mv_curves}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/math_65e29ecfae_rollout24.png}
+        \caption{MATH rollout: Logp and self-certainty ($K_i$).}
+        \label{fig:app_traj_math}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.49\linewidth}
+        \centering
+        \safeincludegraphics[width=\linewidth]{figures/mathvista_3e7c535ec4_rollout2.png}
+        \caption{MathVista rollout: Calibrated confidence and visual engagement.}
+        \label{fig:app_traj_mv}
+    \end{subfigure}
+    \caption{Illustrative Token-Level Internal Metric Trajectories (32-token rolling means) showing evolution of quality signals across generation steps.}
+    \label{fig:app_trajectories}
+\end{figure}
+
+% -------------------------------------------------------------------------
+\section{Qualitative Case Studies and Illustrative Transcripts}
+\label{sec:app_qualitative}
+
+\subsection{Task 1: Qualitative Prompt Comparisons}
+\label{sec:app_t1_cases}
+\writetodo{Paste your own verbatim excerpts from the first and last underlying questions of \texttt{first\_plot\_questions.yaml} across the Plain, JSON, and Template formats and the 7 conditions (Baseline, Full FT Midpoint, Full FT Final, L2-SP, LoRA-4, LoRA-16, OPLoRA-16), and write your own annotation commentary.}
+
+\subsection{Task 2: Complementary Pair Grounding Excerpts}
+\label{sec:app_t2_cases}
+\writetodo{Include your complementary pair examples (e.g., \texttt{grounding\_test-0000} and \texttt{natural-262148000-262148001} or side-by-side image figures if desired), showing the shared question, reference answers, and model predictions under Correct, Swap, Mismatched, and No-Image conditions, and write your own explanation of example selection and observed behavior.}
+
+\subsection{Task 3: Refinement Transitions and Recoverable Early Stops}
+\label{sec:app_t3_cases}
+\writetodo{Include verbatim transcripts from your saved Task 3 outputs for:
+(1) Selection disagreement between Logp, Self-Consistency, and Self-Certainty/VisConf + RWC;
+(2) A live sequential refinement transition (e.g., Correct-to-Wrong or Wrong-to-Correct from your 50-question run);
+(3) A recoverable premature early stop (e.g., \texttt{math/65e29ecfae}) where early agreement at $n=4$ or $8$ chose an incorrect answer that Fixed-32 SC/RWC overturned.}
+
+\end{document}

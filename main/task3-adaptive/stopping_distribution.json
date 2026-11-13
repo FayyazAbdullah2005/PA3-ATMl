@@ -1,0 +1,98 @@
+[
+  {
+    "dataset": "math",
+    "family": "agreement",
+    "N": 4,
+    "count": 5320
+  },
+  {
+    "dataset": "math",
+    "family": "agreement",
+    "N": 8,
+    "count": 430
+  },
+  {
+    "dataset": "math",
+    "family": "agreement",
+    "N": 16,
+    "count": 107
+  },
+  {
+    "dataset": "math",
+    "family": "agreement",
+    "N": 32,
+    "count": 2143
+  },
+  {
+    "dataset": "math",
+    "family": "quality",
+    "N": 4,
+    "count": 6146
+  },
+  {
+    "dataset": "math",
+    "family": "quality",
+    "N": 8,
+    "count": 468
+  },
+  {
+    "dataset": "math",
+    "family": "quality",
+    "N": 16,
+    "count": 104
+  },
+  {
+    "dataset": "math",
+    "family": "quality",
+    "N": 32,
+    "count": 1282
+  },
+  {
+    "dataset": "mathvista",
+    "family": "agreement",
+    "N": 4,
+    "count": 4623
+  },
+  {
+    "dataset": "mathvista",
+    "family": "agreement",
+    "N": 8,
+    "count": 691
+  },
+  {
+    "dataset": "mathvista",
+    "family": "agreement",
+    "N": 16,
+    "count": 134
+  },
+  {
+    "dataset": "mathvista",
+    "family": "agreement",
+    "N": 32,
+    "count": 2552
+  },
+  {
+    "dataset": "mathvista",
+    "family": "quality",
+    "N": 4,
+    "count": 4760
+  },
+  {
+    "dataset": "mathvista",
+    "family": "quality",
+    "N": 8,
+    "count": 829
+  },
+  {
+    "dataset": "mathvista",
+    "family": "quality",
+    "N": 16,
+    "count": 298
+  },
+  {
+    "dataset": "mathvista",
+    "family": "quality",
+    "N": 32,
+    "count": 2113
+  }
+]

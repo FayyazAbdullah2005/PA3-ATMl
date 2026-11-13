@@ -1,0 +1,18 @@
+{
+  "trainable_parameters": 596049920,
+  "reference_bytes": 0,
+  "reference_setup_seconds": 1.8709999949351186e-06,
+  "basis_bytes": 0,
+  "basis_preprocessing_seconds": 0,
+  "optimizer_seconds": 5081.3087125519905,
+  "data_seconds": 3.9772085959893957,
+  "checkpoint_seconds": 423.119488617,
+  "amp_skipped_attempts": 0,
+  "hardware_segments": [
+    {
+      "hardware": "NVIDIA A10",
+      "start_update": 1
+    }
+  ],
+  "training_wall_seconds": 5508.40540976498
+}

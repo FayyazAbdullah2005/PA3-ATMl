@@ -1,0 +1,11 @@
+{
+  "update": 3750,
+  "training_seconds": 2648.9259391609994,
+  "trainable_parameters": 6424576,
+  "peak_gpu_bytes": 2837151744,
+  "mixture_counts": {
+    "caption": 41902,
+    "presence": 12142,
+    "counting": 5956
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "updates": 4500,
+  "training_seconds": 3221.6410121270023,
+  "mixture_counts": {
+    "caption": 43104,
+    "presence": 13360,
+    "counting": 7164,
+    "natural": 8372
+  }
+}

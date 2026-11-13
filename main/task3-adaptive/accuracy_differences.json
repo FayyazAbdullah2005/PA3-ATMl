@@ -1,0 +1,34 @@
+[
+  {
+    "dataset": "math",
+    "family": "agreement",
+    "difference": -0.0017499999999999987,
+    "low": -0.004878124999999999,
+    "high": 0.0015000000000000011,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "family": "quality",
+    "difference": -0.009499999999999998,
+    "low": -0.015124999999999998,
+    "high": -0.0041249999999999985,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "family": "agreement",
+    "difference": -0.0038749999999999982,
+    "low": -0.009749999999999998,
+    "high": 0.0018750000000000014,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "family": "quality",
+    "difference": -0.005999999999999997,
+    "low": -0.012624999999999997,
+    "high": 0.0015000000000000013,
+    "resamples": 1000
+  }
+]

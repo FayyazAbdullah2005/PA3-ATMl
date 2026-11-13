@@ -1,0 +1,142 @@
+[
+  {
+    "suite": "grounding_test",
+    "type": "all",
+    "metric": "score",
+    "tokens": 49,
+    "difference": 0.328125,
+    "low": 0.171875,
+    "high": 0.4765625,
+    "resamples": 4000
+  },
+  {
+    "suite": "grounding_test",
+    "type": "all",
+    "metric": "nll",
+    "tokens": 49,
+    "difference": 0.9636230453397729,
+    "low": 0.6282745361850175,
+    "high": 1.3126922655897946,
+    "resamples": 4000
+  },
+  {
+    "suite": "grounding_test",
+    "type": "counting",
+    "metric": "score",
+    "tokens": 49,
+    "difference": 0.25,
+    "low": 0.046875,
+    "high": 0.453125,
+    "resamples": 4000
+  },
+  {
+    "suite": "grounding_test",
+    "type": "counting",
+    "metric": "nll",
+    "tokens": 49,
+    "difference": 0.47119140293216333,
+    "low": 0.1503784093889408,
+    "high": 0.8552551296816092,
+    "resamples": 4000
+  },
+  {
+    "suite": "grounding_test",
+    "type": "presence",
+    "metric": "score",
+    "tokens": 49,
+    "difference": 0.40625,
+    "low": 0.15625,
+    "high": 0.625,
+    "resamples": 4000
+  },
+  {
+    "suite": "grounding_test",
+    "type": "presence",
+    "metric": "nll",
+    "tokens": 49,
+    "difference": 1.4560546877473826,
+    "low": 0.8994140677932592,
+    "high": 2.028814695372785,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "all",
+    "metric": "score",
+    "tokens": 49,
+    "difference": 0.22395833333333334,
+    "low": 0.12967447916666666,
+    "high": 0.32136718750000004,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "all",
+    "metric": "nll",
+    "tokens": 49,
+    "difference": 0.8404734218299078,
+    "low": 0.5573928597730021,
+    "high": 1.14732393201654,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "number",
+    "metric": "score",
+    "tokens": 49,
+    "difference": 0.2354166666666667,
+    "low": 0.018750000000000006,
+    "high": 0.4604166666666667,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "number",
+    "metric": "nll",
+    "tokens": 49,
+    "difference": 1.2460937458090484,
+    "low": 0.6272705049836077,
+    "high": 1.9013834468166655,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "other",
+    "metric": "score",
+    "tokens": 49,
+    "difference": 0.25416666666666665,
+    "low": 0.10416666666666667,
+    "high": 0.41111111111111115,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "other",
+    "metric": "nll",
+    "tokens": 49,
+    "difference": 1.2616617659934692,
+    "low": 0.7148444554011802,
+    "high": 1.902463812340284,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "yes/no",
+    "metric": "score",
+    "tokens": 49,
+    "difference": 0.18611111111111112,
+    "low": 0.051388888888888894,
+    "high": 0.3333333333333333,
+    "resamples": 4000
+  },
+  {
+    "suite": "natural_test",
+    "type": "yes/no",
+    "metric": "nll",
+    "tokens": 49,
+    "difference": 0.14887152834691936,
+    "low": 0.05664062552257545,
+    "high": 0.24219292827442082,
+    "resamples": 4000
+  }
+]

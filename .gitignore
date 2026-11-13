@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+data/
+runs/
+artifacts/
+exports/
+*.pt
+*.safetensors
+*.zip
+.env
+.modal.toml
+.testdeps/
+
+# Raw image downloads and large datasets (per manual and README instructions)
+main/images/
+report/images/
+
+# Exceeds GitHub 100MB limit (compact parquet equivalent retained)
+main/task3-offline/selections.csv
+
+# Root prompt PDFs
+*.pdf
+!report/*.pdf
+
+# OS/Editor artifacts
+.DS_Store
+Thumbs.db

@@ -1,0 +1,21 @@
+# GPU/container environment. Windows launcher needs only requirements-launcher.txt.
+torch==2.8.0
+torchvision==0.23.0
+transformers==4.57.1
+accelerate==1.10.1
+peft==0.17.1
+datasets==4.0.0
+huggingface-hub==0.35.3
+safetensors==0.6.2
+numpy==2.2.6
+pandas==2.3.2
+pyarrow==21.0.0
+scipy==1.16.1
+matplotlib==3.10.5
+Pillow==11.3.0
+PyYAML==6.0.2
+requests==2.32.5
+gdown==5.2.0
+math-verify==0.8.0
+lm-eval==0.4.9.2
+

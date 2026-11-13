@@ -1,0 +1,5 @@
+{
+  "max_abs_logit_error_fp32": 1.8835067749023438e-05,
+  "max_abs_logit_error_fp16": 0.03125,
+  "fp16_argmax_agrees": true
+}

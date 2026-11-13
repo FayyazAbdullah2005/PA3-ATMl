@@ -1,0 +1,42 @@
+[
+  {
+    "dataset": "math",
+    "family": "agreement",
+    "tau": 0.625,
+    "gamma": null,
+    "accuracy": 0.826,
+    "tokens": 7302.413,
+    "fixed32_accuracy": 0.825,
+    "eligible": true
+  },
+  {
+    "dataset": "math",
+    "family": "quality",
+    "tau": 0.5,
+    "gamma": 0,
+    "accuracy": 0.8205,
+    "tokens": 5575.534,
+    "fixed32_accuracy": 0.825,
+    "eligible": true
+  },
+  {
+    "dataset": "mathvista",
+    "family": "agreement",
+    "tau": 0.625,
+    "gamma": null,
+    "accuracy": 0.641,
+    "tokens": 5266.9815,
+    "fixed32_accuracy": 0.6425,
+    "eligible": true
+  },
+  {
+    "dataset": "mathvista",
+    "family": "quality",
+    "tau": 0.5,
+    "gamma": 0.25,
+    "accuracy": 0.6325,
+    "tokens": 4622.952,
+    "fixed32_accuracy": 0.6425,
+    "eligible": true
+  }
+]

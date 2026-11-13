@@ -1,0 +1,5 @@
+﻿dataset,family,accuracy,tokens,mean_rollouts,premature_error,recoverable_error
+math,agreement,0.734875,10197.230375,11.876,0.085125,0.005875
+math,quality,0.727125,7587.066125,8.877,0.152125,0.018625
+mathvista,agreement,0.626125,4570.814,13.4785,0.144875,0.017
+mathvista,quality,0.624,4051.370875,12.257,0.17775,0.024

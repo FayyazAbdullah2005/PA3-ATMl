@@ -1,0 +1,1522 @@
+[
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "first",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 1,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.024375,
+    "low": 0.017746875000000002,
+    "high": 0.031003124999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": 0.024375,
+    "low": 0.017746875000000002,
+    "high": 0.031003124999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.024375,
+    "low": 0.017746875000000002,
+    "high": 0.031003124999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.024375,
+    "low": 0.017746875000000002,
+    "high": 0.031003124999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "first",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.017,
+    "low": 0.01,
+    "high": 0.024628124999999994,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": 0.017,
+    "low": 0.01,
+    "high": 0.024628124999999994,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 2,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.045,
+    "low": 0.035121875000000004,
+    "high": 0.055128125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.002875,
+    "low": -0.012378125,
+    "high": 0.0052562499999999936,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.056374999999999995,
+    "low": 0.047121875,
+    "high": 0.065378125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.0085,
+    "low": 0.0012500000000000013,
+    "high": 0.015499999999999998,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.047874999999999994,
+    "low": -0.05550312500000001,
+    "high": -0.040371874999999995,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.035750000000000004,
+    "low": 0.025750000000000002,
+    "high": 0.046,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.012124999999999999,
+    "low": -0.022253124999999995,
+    "high": -0.0023718750000000007,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 4,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.047874999999999994,
+    "low": 0.040371874999999995,
+    "high": 0.05550312500000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.059625000000000004,
+    "low": 0.04712499999999999,
+    "high": 0.07188125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.019250000000000003,
+    "low": -0.031131250000000003,
+    "high": -0.007121875000000002,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.09175000000000001,
+    "low": 0.07986875,
+    "high": 0.10375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.012875000000000001,
+    "low": 0.006875000000000001,
+    "high": 0.018753125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.07887500000000001,
+    "low": -0.09012812499999999,
+    "high": -0.06799687500000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.032374999999999994,
+    "low": 0.019621875,
+    "high": 0.044500000000000005,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.04650000000000001,
+    "low": -0.059875,
+    "high": -0.033375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 8,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.07887500000000001,
+    "low": 0.067996875,
+    "high": 0.09012812499999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.071125,
+    "low": 0.05662500000000001,
+    "high": 0.08625624999999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.021374999999999998,
+    "low": -0.03788125,
+    "high": -0.006118750000000005,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.10425000000000001,
+    "low": 0.09074687499999999,
+    "high": 0.11750624999999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.01175,
+    "low": 0.005246875,
+    "high": 0.018003125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.0925,
+    "low": -0.10612500000000001,
+    "high": -0.07924375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.024124999999999997,
+    "low": 0.008996874999999998,
+    "high": 0.03875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.068375,
+    "low": -0.0875,
+    "high": -0.051121875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 16,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.0925,
+    "low": 0.07924375,
+    "high": 0.10612500000000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.065,
+    "low": 0.044996875,
+    "high": 0.08412812499999998,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.032875,
+    "low": -0.056515625,
+    "high": -0.009865625000000008,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.11412499999999999,
+    "low": 0.097359375,
+    "high": 0.13014687499999997,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.016249999999999997,
+    "low": 0.0055000000000000005,
+    "high": 0.02775,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.09787499999999999,
+    "low": -0.11375,
+    "high": -0.08211875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "logp",
+    "baseline": "first",
+    "difference": -2.220446049250313e-18,
+    "low": -0.021384375,
+    "high": 0.02038437499999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.09787500000000002,
+    "low": -0.123759375,
+    "high": -0.073875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.09787499999999999,
+    "low": 0.08211875,
+    "high": 0.11375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "shortest",
+    "baseline": "first",
+    "difference": -0.017625000000000002,
+    "low": -0.03975312499999999,
+    "high": 0.0025031249999999945,
+    "resamples": 1000
+  },
+  {
+    "dataset": "math",
+    "N": 32,
+    "method": "shortest",
+    "baseline": "sc",
+    "difference": -0.11549999999999999,
+    "low": -0.142128125,
+    "high": -0.09075,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "first",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "visconf",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "visconf",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "visconf_rwc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "visconf_rwc",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "vision",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "vision",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "vision_rwc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 1,
+    "method": "vision_rwc",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.012624999999999999,
+    "low": 0.004746875,
+    "high": 0.021,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": 0.012624999999999999,
+    "low": 0.004746875,
+    "high": 0.021,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.012624999999999999,
+    "low": 0.004746875,
+    "high": 0.021,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.012624999999999999,
+    "low": 0.004746875,
+    "high": 0.021,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "first",
+    "baseline": "sc",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.007750000000000002,
+    "low": 0.0002468750000000013,
+    "high": 0.015628125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": 0.007750000000000002,
+    "low": 0.0002468750000000013,
+    "high": 0.015628125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "visconf",
+    "baseline": "first",
+    "difference": 0.017375,
+    "low": 0.008996875,
+    "high": 0.025999999999999995,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "visconf",
+    "baseline": "sc",
+    "difference": 0.017375,
+    "low": 0.008996875,
+    "high": 0.025999999999999995,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "visconf_rwc",
+    "baseline": "first",
+    "difference": 0.017375,
+    "low": 0.008996875,
+    "high": 0.025999999999999995,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "visconf_rwc",
+    "baseline": "sc",
+    "difference": 0.017375,
+    "low": 0.008996875,
+    "high": 0.025999999999999995,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "vision",
+    "baseline": "first",
+    "difference": 0.010000000000000002,
+    "low": 0.001500000000000003,
+    "high": 0.018500000000000003,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "vision",
+    "baseline": "sc",
+    "difference": 0.010000000000000002,
+    "low": 0.001500000000000003,
+    "high": 0.018500000000000003,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "vision_rwc",
+    "baseline": "first",
+    "difference": 0.010000000000000002,
+    "low": 0.001500000000000003,
+    "high": 0.018500000000000003,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 2,
+    "method": "vision_rwc",
+    "baseline": "sc",
+    "difference": 0.010000000000000002,
+    "low": 0.001500000000000003,
+    "high": 0.018500000000000003,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.019500000000000003,
+    "low": 0.009121875,
+    "high": 0.030881249999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.02825,
+    "low": -0.03875,
+    "high": -0.016375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.037625,
+    "low": 0.028493749999999998,
+    "high": 0.046625,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": -0.010125,
+    "low": -0.017503125,
+    "high": -0.002743750000000005,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.047749999999999994,
+    "low": -0.055875,
+    "high": -0.0385,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "logp",
+    "baseline": "first",
+    "difference": 0.0006249999999999995,
+    "low": -0.011128125000000003,
+    "high": 0.011503124999999993,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.047125,
+    "low": -0.058375,
+    "high": -0.035250000000000004,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.047749999999999994,
+    "low": 0.0385,
+    "high": 0.055875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "visconf",
+    "baseline": "first",
+    "difference": 0.031375,
+    "low": 0.019993749999999998,
+    "high": 0.043875000000000004,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "visconf",
+    "baseline": "sc",
+    "difference": -0.016374999999999997,
+    "low": -0.027125,
+    "high": -0.004375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "visconf_rwc",
+    "baseline": "first",
+    "difference": 0.0405,
+    "low": 0.0305,
+    "high": 0.050631249999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "visconf_rwc",
+    "baseline": "sc",
+    "difference": -0.0072499999999999995,
+    "low": -0.014874999999999998,
+    "high": 0.0006250000000000004,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "vision",
+    "baseline": "first",
+    "difference": 0.005625,
+    "low": -0.006134374999999998,
+    "high": 0.01750625,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "vision",
+    "baseline": "sc",
+    "difference": -0.042125,
+    "low": -0.053878125,
+    "high": -0.030374999999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "vision_rwc",
+    "baseline": "first",
+    "difference": 0.029749999999999995,
+    "low": 0.019996874999999997,
+    "high": 0.03950624999999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 4,
+    "method": "vision_rwc",
+    "baseline": "sc",
+    "difference": -0.018,
+    "low": -0.025999999999999995,
+    "high": -0.010243750000000005,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.013375,
+    "low": 0.0002499999999999991,
+    "high": 0.026875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.061375,
+    "low": -0.076875,
+    "high": -0.046625,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.07237500000000001,
+    "low": 0.060871875000000006,
+    "high": 0.084003125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": -0.002375,
+    "low": -0.009628125,
+    "high": 0.004874999999999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.07475000000000001,
+    "low": -0.086625,
+    "high": -0.063,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "logp",
+    "baseline": "first",
+    "difference": -0.012500000000000002,
+    "low": -0.025753125,
+    "high": 0.0012499999999999972,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.08725,
+    "low": -0.10212812500000001,
+    "high": -0.071621875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.07475000000000001,
+    "low": 0.063,
+    "high": 0.086625,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "visconf",
+    "baseline": "first",
+    "difference": 0.03525,
+    "low": 0.020500000000000004,
+    "high": 0.05,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "visconf",
+    "baseline": "sc",
+    "difference": -0.0395,
+    "low": -0.05450624999999999,
+    "high": -0.0245,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "visconf_rwc",
+    "baseline": "first",
+    "difference": 0.07874999999999999,
+    "low": 0.066121875,
+    "high": 0.09138125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "visconf_rwc",
+    "baseline": "sc",
+    "difference": 0.004000000000000001,
+    "low": -0.00375,
+    "high": 0.011374999999999998,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "vision",
+    "baseline": "first",
+    "difference": 0.01,
+    "low": -0.005878125000000002,
+    "high": 0.02463437499999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "vision",
+    "baseline": "sc",
+    "difference": -0.06475,
+    "low": -0.081253125,
+    "high": -0.04836875000000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "vision_rwc",
+    "baseline": "first",
+    "difference": 0.07225000000000001,
+    "low": 0.059240625,
+    "high": 0.085003125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 8,
+    "method": "vision_rwc",
+    "baseline": "sc",
+    "difference": -0.0025,
+    "low": -0.010625,
+    "high": 0.005628124999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.016,
+    "low": -0.0011312499999999988,
+    "high": 0.03388437499999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.0765,
+    "low": -0.097628125,
+    "high": -0.055999999999999994,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.09387500000000001,
+    "low": 0.07949999999999999,
+    "high": 0.10837812499999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.0013750000000000014,
+    "low": -0.006003125000000001,
+    "high": 0.009753124999999998,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.0925,
+    "low": -0.107753125,
+    "high": -0.07874687500000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "logp",
+    "baseline": "first",
+    "difference": -0.024125,
+    "low": -0.04176250000000001,
+    "high": -0.005750000000000002,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.11662499999999999,
+    "low": -0.136634375,
+    "high": -0.09562187500000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.0925,
+    "low": 0.078746875,
+    "high": 0.10775312499999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "visconf",
+    "baseline": "first",
+    "difference": 0.035,
+    "low": 0.015621874999999999,
+    "high": 0.053378125000000005,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "visconf",
+    "baseline": "sc",
+    "difference": -0.0575,
+    "low": -0.07625,
+    "high": -0.03711875000000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "visconf_rwc",
+    "baseline": "first",
+    "difference": 0.09787500000000002,
+    "low": 0.08211875,
+    "high": 0.11325937499999998,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "visconf_rwc",
+    "baseline": "sc",
+    "difference": 0.005374999999999999,
+    "low": -0.0033749999999999995,
+    "high": 0.013125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "vision",
+    "baseline": "first",
+    "difference": 0.004125000000000001,
+    "low": -0.015625,
+    "high": 0.02338124999999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "vision",
+    "baseline": "sc",
+    "difference": -0.08837499999999998,
+    "low": -0.10987812500000001,
+    "high": -0.06636875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "vision_rwc",
+    "baseline": "first",
+    "difference": 0.09287500000000001,
+    "low": 0.077,
+    "high": 0.108125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 16,
+    "method": "vision_rwc",
+    "baseline": "sc",
+    "difference": 0.0003749999999999998,
+    "low": -0.008381250000000002,
+    "high": 0.009378124999999998,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "certainty",
+    "baseline": "first",
+    "difference": 0.014750000000000001,
+    "low": -0.010003125000000002,
+    "high": 0.03924999999999999,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "certainty",
+    "baseline": "sc",
+    "difference": -0.08375,
+    "low": -0.11375625,
+    "high": -0.05375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "certainty_rwc",
+    "baseline": "first",
+    "difference": 0.1065,
+    "low": 0.08724375,
+    "high": 0.126146875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "certainty_rwc",
+    "baseline": "sc",
+    "difference": 0.008,
+    "low": -0.00564375,
+    "high": 0.023375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "first",
+    "baseline": "sc",
+    "difference": -0.09849999999999999,
+    "low": -0.116003125,
+    "high": -0.08049375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "logp",
+    "baseline": "first",
+    "difference": -0.05025,
+    "low": -0.075634375,
+    "high": -0.025000000000000005,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "logp",
+    "baseline": "sc",
+    "difference": -0.14875,
+    "low": -0.17838437499999998,
+    "high": -0.11786875000000001,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "sc",
+    "baseline": "first",
+    "difference": 0.09849999999999999,
+    "low": 0.08049375,
+    "high": 0.11600312499999998,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "shortest",
+    "baseline": "first",
+    "difference": 0.006499999999999998,
+    "low": -0.018884374999999995,
+    "high": 0.030128124999999995,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "shortest",
+    "baseline": "sc",
+    "difference": -0.092,
+    "low": -0.121753125,
+    "high": -0.062496875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "token_fusion",
+    "baseline": "first",
+    "difference": 0.030999999999999996,
+    "low": 0.005246875,
+    "high": 0.055125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "token_fusion",
+    "baseline": "sc",
+    "difference": -0.0675,
+    "low": -0.095646875,
+    "high": -0.036612500000000006,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "token_fusion_rwc",
+    "baseline": "first",
+    "difference": 0.10725,
+    "low": 0.08724375,
+    "high": 0.1262625,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "token_fusion_rwc",
+    "baseline": "sc",
+    "difference": 0.00875,
+    "low": -0.005753125,
+    "high": 0.023253125,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "visconf",
+    "baseline": "first",
+    "difference": 0.046,
+    "low": 0.02125,
+    "high": 0.07100625,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "visconf",
+    "baseline": "sc",
+    "difference": -0.0525,
+    "low": -0.080128125,
+    "high": -0.022875000000000006,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "visconf_rwc",
+    "baseline": "first",
+    "difference": 0.11349999999999999,
+    "low": 0.09325,
+    "high": 0.13300312499999997,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "visconf_rwc",
+    "baseline": "sc",
+    "difference": 0.015,
+    "low": 0.0006187500000000015,
+    "high": 0.02925,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "vision",
+    "baseline": "first",
+    "difference": 0.004750000000000003,
+    "low": -0.022753125000000003,
+    "high": 0.031128124999999996,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "vision",
+    "baseline": "sc",
+    "difference": -0.09375,
+    "low": -0.124128125,
+    "high": -0.062371875,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "vision_rwc",
+    "baseline": "first",
+    "difference": 0.10725000000000001,
+    "low": 0.08674375000000001,
+    "high": 0.128375,
+    "resamples": 1000
+  },
+  {
+    "dataset": "mathvista",
+    "N": 32,
+    "method": "vision_rwc",
+    "baseline": "sc",
+    "difference": 0.00875,
+    "low": -0.00663125,
+    "high": 0.024378124999999997,
+    "resamples": 1000
+  }
+]

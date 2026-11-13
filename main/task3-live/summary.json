@@ -1,0 +1,41 @@
+[
+  {
+    "strategy": "long",
+    "accuracy": 0.58,
+    "input_tokens": 5419,
+    "output_tokens": 32352,
+    "seconds": 798.5239871779999,
+    "extraction_failure": 0.0,
+    "truncated_calls": 0,
+    "calls": 50,
+    "peak_gpu_bytes": 6244723200,
+    "wrong_to_correct": 0,
+    "correct_to_wrong": 0
+  },
+  {
+    "strategy": "parallel",
+    "accuracy": 0.6,
+    "input_tokens": 16257,
+    "output_tokens": 91706,
+    "seconds": 2265.5155238109987,
+    "extraction_failure": 0.16,
+    "truncated_calls": 24,
+    "calls": 150,
+    "peak_gpu_bytes": 6231961088,
+    "wrong_to_correct": 0,
+    "correct_to_wrong": 0
+  },
+  {
+    "strategy": "refinement",
+    "accuracy": 0.58,
+    "input_tokens": 43408,
+    "output_tokens": 60832,
+    "seconds": 1504.5842983689995,
+    "extraction_failure": 0.04,
+    "truncated_calls": 11,
+    "calls": 100,
+    "peak_gpu_bytes": 6327695360,
+    "wrong_to_correct": 1,
+    "correct_to_wrong": 2
+  }
+]

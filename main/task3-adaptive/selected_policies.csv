@@ -1,0 +1,5 @@
+﻿dataset,family,tau,gamma,accuracy,tokens,fixed32_accuracy,eligible
+math,agreement,0.625,,0.826,7302.413,0.825,True
+math,quality,0.5,0,0.8205,5575.534,0.825,True
+mathvista,agreement,0.625,,0.641,5266.9815,0.6425,True
+mathvista,quality,0.5,0.25,0.6325,4622.952,0.6425,True

@@ -1,0 +1,17 @@
+﻿dataset,family,N,count
+math,agreement,4,5320
+math,agreement,8,430
+math,agreement,16,107
+math,agreement,32,2143
+math,quality,4,6146
+math,quality,8,468
+math,quality,16,104
+math,quality,32,1282
+mathvista,agreement,4,4623
+mathvista,agreement,8,691
+mathvista,agreement,16,134
+mathvista,agreement,32,2552
+mathvista,quality,4,4760
+mathvista,quality,8,829
+mathvista,quality,16,298
+mathvista,quality,32,2113
